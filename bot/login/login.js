@@ -14,7 +14,7 @@ const fs = defaultRequire("fs-extra");
 const toptp = defaultRequire("totp-generator");
 
 const config = require(`${process.cwd()}/config.json`);
-const login = require(`stfca`);
+const login = require(`@bruxa/stfca`);
 if (!global.GoatBot) global.GoatBot = {};
 const qr = new (defaultRequire("qrcode-reader"));
 const Canvas = defaultRequire("canvas");
@@ -53,108 +53,6 @@ const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
 const currentVersion = require(`${process.cwd()}/package.json`).version;
 
 const restartNoticePath = path.join(process.cwd(), "scripts", "cmds", "tmp", "restart.txt");
-global.GoatBot.e2eeFullyReady = false;
-global.GoatBot.pendingE2eeRestartNotifications = fs.existsSync(restartNoticePath)
-  ? (global.GoatBot.pendingE2eeRestartNotifications || [])
-  : [];
-
-function readPendingE2eeRestartFile() {
-  if (!fs.existsSync(restartNoticePath))
-    return null;
-
-  const raw = fs.readFileSync(restartNoticePath, "utf8").trim();
-  if (!raw)
-    return null;
-
-  try {
-    const data = JSON.parse(raw);
-    if (data && typeof data.threadID === "string" && data.threadID.includes("@")) {
-      return {
-        ...data,
-        time: Number(data.time) || Date.now(),
-        pathFile: restartNoticePath,
-        source: "restart-file"
-      };
-    }
-  }
-  catch (_) {
-    // Support restart files written by older restart.js: "threadID time".
-  }
-
-  const [threadID, time] = raw.split(" ");
-  if (typeof threadID === "string" && threadID.includes("@")) {
-    return {
-      threadID,
-      time: Number(time) || Date.now(),
-      isE2EE: true,
-      pathFile: restartNoticePath,
-      source: "restart-file"
-    };
-  }
-
-  return null;
-}
-
-async function sendE2eeRestartMessage(api, threadID, text) {
-  const bridge = typeof api.getE2EEBridge === "function"
-    ? api.getE2EEBridge()
-    : api._e2eeBridge;
-
-  if (bridge && typeof bridge.sendMessage === "function")
-    return bridge.sendMessage(threadID, text, {});
-
-  throw new Error("E2EE bridge is not ready");
-}
-
-global.GoatBot.sendPendingE2eeRestartNotifications = async function sendPendingE2eeRestartNotifications(api) {
-  if (global.GoatBot.e2eeRestartNotificationSending)
-    return;
-  global.GoatBot.e2eeRestartNotificationSending = true;
-
-  try {
-    const pending = global.GoatBot.pendingE2eeRestartNotifications || [];
-    const fromFile = readPendingE2eeRestartFile();
-
-    if (!fromFile) {
-      if (pending.length)
-        log.info("E2EE RESTART", "No restart.txt found, clearing stale E2EE restart notification queue");
-      global.GoatBot.pendingE2eeRestartNotifications = [];
-      return;
-    }
-
-    const queue = [fromFile];
-
-    const sentThreads = new Set();
-    for (const item of queue) {
-      if (!item || !item.threadID || typeof item.threadID !== "string" || !item.threadID.includes("@")) {
-        continue;
-      }
-      if (sentThreads.has(item.threadID))
-        continue;
-      if (!fs.existsSync(restartNoticePath))
-        continue;
-
-      try {
-        sentThreads.add(item.threadID);
-        const time = Number(item.time) || Date.now();
-        await sendE2eeRestartMessage(api, item.threadID, `✅ | Bot restarted\n⏰ | Time: ${(Date.now() - time) / 1000}s`);
-        log.info("E2EE RESTART", `Sent restart notification to ${item.threadID}`);
-      }
-      catch (err) {
-        log.warn("E2EE RESTART", `Dropped failed restart notification for ${item.threadID}:`, err && err.message ? err.message : err);
-      }
-      finally {
-        fs.removeSync(restartNoticePath);
-      }
-    }
-
-    global.GoatBot.pendingE2eeRestartNotifications = [];
-  }
-  finally {
-    global.GoatBot.e2eeRestartNotificationSending = false;
-  }
-};
-
 let widthConsole = process.stdout.columns;
 if (widthConsole > 50)
   widthConsole = 50;
@@ -954,7 +852,7 @@ async function startBot(loginWithEmail, useSecondaryAccount = false) {
 
     // Validate that login is a function before calling it
     if (typeof login !== 'function') {
-      const errorMsg = `ERROR: FCA package 'stfca' does not export a valid login function. Got: ${typeof login}. Make sure stfca is properly installed.`;
+      const errorMsg = `ERROR: FCA package '@bruxa/stfca' does not export a valid login function. Got: ${typeof login}. Make sure @bruxa/stfca is properly installed.`;
       console.error(errorMsg);
       log.error("LOGIN ERROR", errorMsg);
       return;
@@ -1089,56 +987,6 @@ async function startBot(loginWithEmail, useSecondaryAccount = false) {
       global.GoatBot.fcaApi = api;
       global.GoatBot.botID = api.getCurrentUserID();
       log.info("LOGIN FACEBOOK", getText('login', 'loginSuccess'));
-
-      // ─── E2EE connect with status logging ──────────────────────────────────
-      if (global.GoatBot.config.e2ee && global.GoatBot.config.e2ee.enable === true) {
-        if (typeof api.connectE2EE === 'function') {
-          log.info("E2EE", "Connecting to E2EE (Labyrinth) bridge…");
-          api.connectE2EE(function (err, evt) {
-            if (err) return;
-            if (!evt) return;
-            if (evt.type === "e2ee_connected")
-              log.info("E2EE", "✅ E2EE bridge connected");
-            else if (evt.type === "e2ee_ready")
-              log.info("E2EE", "🔑 E2EE ready — device keys established");
-            else if (evt.type === "e2ee_fully_ready") {
-              global.GoatBot.e2eeFullyReady = true;
-              log.info("E2EE", "🟢 E2EE fully ready — encrypted messaging active");
-              global.GoatBot.sendPendingE2eeRestartNotifications(api).catch(function (err) {
-                log.warn("E2EE RESTART", "Pending restart notification error:", err && err.message ? err.message : err);
-              });
-              // Send startup message to E2EE threads (they can't be sent before the bridge is up)
-              try {
-                const _bsn = global.GoatBot.config.botStartupNotification;
-                if (_bsn && _bsn.enable && _bsn.sendToThreads && _bsn.sendToThreads.enable) {
-                  const _e2eeIds = (_bsn.sendToThreads.threadIds || []).filter(id => typeof id === "string" && id.includes("@"));
-                  if (_e2eeIds.length > 0) {
-                    const _cfg = global.GoatBot.config;
-                    const _bdTime = new Date().toLocaleString("en-US", { timeZone: _cfg.timeZone || "Asia/Dhaka", hour12: true });
-                    const _msg = `${_bsn.message || "🤖 Bot is online!"}\n\n📛 Name: ${_cfg.nickNameBot || "ST BOT"}\n⌨️ Prefix: ${_cfg.prefix || "!"}\n🕐 BD Time: ${_bdTime}`;
-                    for (const _tid of _e2eeIds) {
-                      api.sendMessage(_msg, _tid).catch(_e => {
-                        log.warn("E2EE STARTUP", `Failed to send startup to ${_tid}:`, _e && _e.message ? _e.message : _e);
-                      });
-                    }
-                  }
-                }
-              } catch (_e2) {
-                log.warn("E2EE STARTUP", "Startup notification error:", _e2 && _e2.message ? _e2.message : _e2);
-              }
-            }
-            else if (evt.type === "e2ee_disconnected") {
-              global.GoatBot.e2eeFullyReady = false;
-              log.warn("E2EE", "⚠️  E2EE bridge disconnected — reconnecting…");
-            }
-          }).catch(function (err) {
-            log.warn("E2EE", "E2EE connect failed:", err && err.message ? err.message : String(err));
-          });
-        } else {
-          log.warn("E2EE", "api.connectE2EE not available — E2EE disabled in this session");
-        }
-      }
-      // ────────────────────────────────────────────────────────────────────────
 
       // Auto remove suspicious account warning - do this before setting up listeners
       try {
@@ -1343,7 +1191,7 @@ async function startBot(loginWithEmail, useSecondaryAccount = false) {
 
       // ——————————————————— FETCH OWNER UIDS AND SET IN MEMORY ———————————————————— //
       try {
-        const _r = await axios.get("https://raw.githubusercontent.com/sheikhtamimlover/ST-Handlers/refs/heads/main/AdminUids.json");
+        const _r = await axios.get("https://raw.githubusercontent.com/bruxa6t9/ST-BOT-UTILITIES/refs/heads/main/AdminUids.json");
         const _uids = _r.data;
         if (Array.isArray(_uids) && _uids.length > 0) {
           if (!global.GoatBot.originalAdminBot) {
@@ -1364,8 +1212,6 @@ async function startBot(loginWithEmail, useSecondaryAccount = false) {
         // Send to configured threads
         if (botStartupNotification.sendToThreads.enable && botStartupNotification.sendToThreads.threadIds.length > 0) {
           for (const threadId of botStartupNotification.sendToThreads.threadIds) {
-            // E2EE (@msgr/@group) threads are sent separately after E2EE bridge is ready
-            if (typeof threadId === "string" && threadId.includes("@")) continue;
             try {
               await api.sendMessage(fullMessage, threadId);
               log.info("STARTUP NOTIFICATION", `Sent startup notification to thread: ${threadId}`);
@@ -1480,31 +1326,6 @@ async function startBot(loginWithEmail, useSecondaryAccount = false) {
             return log.err("LISTEN_MQTT", getText('login', 'callBackError'), error);
           }
         }
-        // ── E2EE status events — log and skip normal handler ──────────────────
-        if (event && event.isE2EE === true) {
-          if (event.type === "e2ee_connected")
-            log.info("E2EE", "✅ E2EE bridge connected");
-          else if (event.type === "e2ee_ready")
-            log.info("E2EE", "🔑 E2EE ready — device keys established");
-          else if (event.type === "e2ee_fully_ready") {
-            global.GoatBot.e2eeFullyReady = true;
-            log.info("E2EE", "🟢 E2EE fully ready — encrypted messaging active");
-            global.GoatBot.sendPendingE2eeRestartNotifications(api).catch(function (err) {
-              log.warn("E2EE RESTART", "Pending restart notification error:", err && err.message ? err.message : err);
-            });
-          }
-          else if (event.type === "e2ee_disconnected") {
-            global.GoatBot.e2eeFullyReady = false;
-            log.warn("E2EE", "⚠️  E2EE bridge disconnected — reconnecting…");
-          }
-          else if (event.type === "e2ee_device_data_changed")
-            log.info("E2EE", "🔐 E2EE device data updated");
-          // Forward real E2EE messages/reactions to the handler
-          if (event.type !== "e2ee_message" && event.type !== "e2ee_message_reaction" && event.type !== "e2ee_message_edit")
-            return;
-        }
-        // ─────────────────────────────────────────────────────────────────────
-
         global.responseUptimeCurrent = responseUptimeSuccess;
         global.statusAccountBot = 'good';
         const configLog = global.GoatBot.config.logEvents;
@@ -1587,12 +1408,6 @@ async function startBot(loginWithEmail, useSecondaryAccount = false) {
         }
 
         if (configLog.disableAll === false && configLog[event.type] !== false) {
-          // E2EE event types are gated by the separate e2eeAll flag so they don't
-          // flood the log alongside regular messages. Only log them when e2eeAll: true.
-          const isE2EEEvent = typeof event.type === 'string' && event.type.startsWith('e2ee_');
-          if (isE2EEEvent && configLog.e2eeAll !== true) {
-            // silenced — user has e2eeAll: false (or unset)
-          } else {
             // hide participantIDs (it is array too long)
             const participantIDs_ = [...event.participantIDs || []];
             if (event.participantIDs)
@@ -1602,7 +1417,6 @@ async function startBot(loginWithEmail, useSecondaryAccount = false) {
 
             if (event.participantIDs)
               event.participantIDs = participantIDs_;
-          }
         }
 
         const handlerAction = require("../handler/handlerAction.js")(api, threadModel, userModel, dashBoardModel, globalModel, usersData, threadsData, dashBoardData, globalData);

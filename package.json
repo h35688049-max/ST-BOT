@@ -1,6 +1,6 @@
 {
   "name": "st-bot",
-  "version": "3.0.00",
+  "version": "3.1.0",
   "description": "A simple Bot chat messenger using personal account. Made by ST | Sheikh Tamim",
   "homepage": "https://github.com/sheikhtamimlover/ST-BOT#readme",
   "bugs": {
@@ -12,6 +12,12 @@
   },
   "license": "MIT",
   "author": "ST | Sheikh Tamim",
+  "contributors": ["ST | Sheikh Tamim", "Bruxa - Rakib Adil"],
+  "maintainers": [{
+    "name": "Bruxa - Rakib Adil",
+    "email": "bruxaxp100k@gmail.com",
+    "url": "https://github.com/bruxa6t9"
+  }],
   "main": "index.js",
   "scripts": {
     "start": "node index.js"

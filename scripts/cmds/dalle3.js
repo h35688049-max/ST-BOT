@@ -1,8 +1,10 @@
 const axios = require('axios');
 const baseApiUrl = async () => {
-    const base = await axios.get("https://gitlab.com/Rakib-Adil-69/shizuoka-command-store/-/raw/main/apiUrls.json");
-    return base.data.dalle;
+    const base = await axios.get("https://raw.githubusercontent.com/bruxa6t9/ST-BOT-UTILITIES/refs/heads/main/apikeys.json");
+    return base.data.api;
 };
+
+const apiKey = global.GoatBot.config?.bruxaApiKey;
 
 module.exports = {
     config: {
@@ -29,6 +31,11 @@ module.exports = {
                 n: 1,
                 model: "dall-e-3",
                 size: "1024x1024"
+            }, {
+                header: {
+                    "x-api-key": apiKey,
+                    "Content-Type": "application/json"
+                }
             });
 
             const images = response.data?.images?.data?.data || [response.data.images || response.data.response];
