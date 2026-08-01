@@ -1,15 +1,18 @@
 const fs = require("fs-extra");
 const { createCanvas, loadImage } = require("canvas");
+const path = require("path");
 
 module.exports = {
   config: {
     name: "kiss",
-    version: "1.0.11",
+    version: "1.2.0",
     author: "Rakib Adil",
+    createdAt: "07-09-2025",
+    cost: 300,
     countDown: 5,
     role: 0,
     longDescription: "{p}kiss @mention or reply someone you want to kiss that person 😚",
-    category: "funny",
+    category: 'fun',
     guide: "{p}kiss and mention someone you want to kiss 🥴",
 	 usePrefix : true,//you can use this cmd to no prefix, just set the true to false.
 	 premium: false,
@@ -39,7 +42,7 @@ module.exports = {
       const canvas = createCanvas(950, 850);
       const ctx = canvas.getContext("2d");
 
-      const background = await loadImage("https://files.catbox.moe/6qg782.jpg");
+      const background = await loadImage(path.join(__dirname, "assets", "images", "kiss.jpg"));
       ctx.drawImage(background, 0, 0, canvas.width, canvas.height);
 
       const avatar1 = await loadImage(avatarURL1);
@@ -61,7 +64,7 @@ module.exports = {
       ctx.drawImage(avatar2, 90, 280, 170, 170);
       ctx.restore();
 
-      const outputPath = `${__dirname}/tmp/kiss_image.png`;
+      const outputPath = path.join(__dirname, "tmp", "kiss_image.png");
       const buffer = canvas.toBuffer("image/png");
 
       fs.writeFileSync(outputPath, buffer);

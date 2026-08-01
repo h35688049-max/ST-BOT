@@ -2,7 +2,7 @@ const axios = require('axios');
 const fs = require("fs");
 const path = require("path");
 const baseApiUrl = async () => {
-  const base = await axios.get("https://raw.githubusercontent.com/bruxa6t9/ST-BOT-UTILITIES/refs/heads/main/apikeys.json");
+  const base = await axios.get("https://raw.githubusercontent.com/bruxa6t9/ST-BOT-UTILITIES/refs/heads/main/apiUrls.json");
   return base.data.api;
 };
 

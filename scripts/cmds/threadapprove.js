@@ -3,8 +3,8 @@ const { getTime } = global.utils;
 
 module.exports = {
 	config: {
-		name: "mthread",
-		aliases: ["threadapprove", "tapprove"],
+		name: "threadapprove",
+		aliases: ["mthread", "tapprove"],
 		version: "2.4.0",
 		author: "Sheikh Tamim",
 		countDown: 5,

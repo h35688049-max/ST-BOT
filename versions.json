@@ -700,13 +700,13 @@
     "dashboard/app.js": "added stagent web",
     "dashboard/css/dashboard.css": "added stagent web",
     "dashboard/js/dashboard.js": "added stagent web",
-    "dashboard/views/dashboard.eta":"added stagent web",
+    "dashboard/views/dashboard.eta": "added stagent web",
     "database/controller/staiHistoryData.js": "added stagent db",
     "bot/stagent.js": "added stagent for contribute with ai",
     "scripts/cmds/e2ee.js": "added e2ee support for work in inbox",
     "scripts/cmds/restart.js": "fixed restart.js for e2ee",
-    "scripts/cmds/stai.js":"improved and decoded stai.js",
-    "scripts/cmds/unsend.js":"fixed unsend.js for work in e2ee event"
+    "scripts/cmds/stai.js": "improved and decoded stai.js",
+    "scripts/cmds/unsend.js": "fixed unsend.js for work in e2ee event"
   },
   "deleteFiles": {
     "fca.js": "This file was deleted",
@@ -744,33 +744,57 @@
     "versions.json": "This file was deleted."
   }
 },
-  {
-    "version": "3.1.0",
-    "files": {
-      "config.json": "added bruxa apikey",
-      "restoreBackup.js": "readded restoreBackup.js and now maintaining again..",
-      "update.js": "readded update.js and now maintaining again..",
-      "updater.js": "readded updater.js and now maintaining again..",
-      "updater.js.save": "readded updater.js.save and now maintaining again..",
-      "versions.json": "readded versions.json and now maintaining again..",
-      "dashboard/views/dashboard.eta": "changed logo",
-      "dashboard/views/login.eta": "changed logo",
-      "dashboard/images/bot-logo.jpg": "added new bot-logo img..",
-      "dashboard/images/logo.jpg": "added new logo..",
-      "scripts/cmds/update.js": "readded update.js and now maintaining again..",
-      "scripts/cmds/aniart.js": "added base api url..",
-      "scripts/cmds/dalle3.js": "added base api url",
-      "scripts/cmds/restart.js": "lol",
-      "scripts/cmds/unsend.js": "lol",
-      "bot/stagent.js": "lol",
-      "bot/handler/handlerAction.js": "lol",
-      "bot/login/login.js": "added new fca"
-    },
-    "deleteFiles": {
-      "dashboard/images/st.png": "removed old logo",
-      "scripts/cmds/stmsg.js": "removed unnecessary file",
-      "scripts/cmds/streport.js": "removed unnecessary file..",
-      "scripts/cmds/e2ee.js": "removed e2ee.js"
-    }
+{
+  "version": "3.1.0",
+  "files": {
+    "config.json": "added bruxa apikey",
+    "restoreBackup.js": "readded restoreBackup.js and now maintaining again..",
+    "update.js": "readded update.js and now maintaining again..",
+    "updater.js": "readded updater.js and now maintaining again..",
+    "updater.js.save": "readded updater.js.save and now maintaining again..",
+    "versions.json": "readded versions.json and now maintaining again..",
+    "dashboard/views/dashboard.eta": "changed logo",
+    "dashboard/views/login.eta": "changed logo",
+    "dashboard/images/bot-logo.jpg": "added new bot-logo img..",
+    "dashboard/images/logo.jpg": "added new logo..",
+    "scripts/cmds/update.js": "readded update.js and now maintaining again..",
+    "scripts/cmds/aniart.js": "added base api url..",
+    "scripts/cmds/dalle3.js": "added base api url",
+    "scripts/cmds/restart.js": "lol",
+    "scripts/cmds/unsend.js": "lol",
+    "bot/stagent.js": "lol",
+    "bot/handler/handlerAction.js": "lol",
+    "bot/login/login.js": "added new fca"
+  },
+  "deleteFiles": {
+    "dashboard/images/st.png": "removed old logo",
+    "scripts/cmds/stmsg.js": "removed unnecessary file",
+    "scripts/cmds/streport.js": "removed unnecessary file..",
+    "scripts/cmds/e2ee.js": "removed e2ee.js"
   }
-]
+}, {
+  "version": "3.1.1",
+  "files": {
+    "scripts/cmds/quiz.js": "upgraded..",
+    "scripts/cmds/assets/images/bgWeather.jpg": "changed path",
+    "scripts/cmds/assets/images/hack.png": "added hack cmd img..",
+    "scripts/cmds/hack.js": "upgraded..",
+    "scripts/cmds/assets/hug.jpg": "added hug img..",
+    "scripts/cmds/hug.js": "upgraded..",
+    "scripts/cmds/assets/kiss.jpg": "added hug img..",
+    "scripts/cmds/kiss.js": "upgraded..",
+    "scripts/cmds/assets/marry.jpg": "added hug img..",
+    "scripts/cmds/marry.js": "upgraded..",
+    "scripts/cmds/threadapprove.js": "upgraded..",
+    "scripts/cmds/shazam.js": "upgraded..",
+    "scripts/cmds/sing.js": "upgraded..",
+    "scripts/cmds/aniart.js": "added new apiurl",
+    "scripts/cmds/dalle3.js": "added new apiurl",
+    "versions.json": "bumped"
+  },
+  "deleteFiles": {
+    "scripts/cmds/music.js": "removed music.js",
+    "scripts/cmds/shareit.js": "removed shareit.js",
+    "scripts/cmds/image/bgWeather.jpg": "changed path.."
+  }
+}]

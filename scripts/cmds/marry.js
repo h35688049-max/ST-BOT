@@ -1,17 +1,18 @@
 const fs = require("fs-extra");
 const { createCanvas, loadImage } = require("canvas");
+const path = require("path");
 
 module.exports = {
     config:{
         name: "marry",
         aliases: ["biye", "hanga"],
-        version: "1.0.11",
+        version: "1.2.1",
         author: "Rakib Adil",
         role: 0,
         countdown: 5,
         description: "marry a person with mention or replying her/his message",
         guide: "{p}marry @mention or reply to her/his message",
-        category: "funny",
+        category: 'fun',
         premium: false,
         usePrefix: true
     },
@@ -37,7 +38,7 @@ module.exports = {
                 const ppUrl2 = await usersData.getAvatarUrl(two);
                 const canvas = createCanvas(900, 850);
                 const ctx = canvas.getContext("2d");
-                const bgImg = await loadImage("https://files.catbox.moe/pxougj.jpg");
+                const bgImg = await loadImage(path.join(__dirname, "assets", "images", "marry.jpg"));
                 ctx.drawImage(bgImg, 0, 0, canvas.width, canvas.height);
 
                 const pp1 = await loadImage(ppUrl1);
@@ -65,9 +66,10 @@ module.exports = {
                 ctx.drawImage(pp2, 150, 170, 170, 170);
                 ctx.restore();
                 
-                const path = __dirname + "/cache/marry.png";
+                const outPath = path.join(__dirname, "cache", "marry.png");
+                fs.ensureDirSync(path.join(__dirname, "cache"));
                 const buffer = canvas.toBuffer("image/png");
-                fs.writeFileSync(path, buffer);
+                fs.writeFileSync(outPath, buffer);
                 
                 const userName1 = await usersData.getName(one);
                 const userName2 = await usersData.getName(two);
@@ -76,7 +78,7 @@ module.exports = {
                     
                     body:`${userName1} married to ${userName2}, congratulations to both of you😊💐`,
                     
-                    attachment: fs.createReadStream(path)}, event.threadID, () => fs.unlinkSync(path), event.messageID);
+                    attachment: fs.createReadStream(outPath)}, event.threadID, () => fs.unlinkSync(outPath), event.messageID);
             } catch (e) {
                 console.log(e);
                 message.reply("An error occurred while processing the image. Please try again later.");

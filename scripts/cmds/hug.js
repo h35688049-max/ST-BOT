@@ -1,12 +1,14 @@
 const fs = require("fs-extra");
 const { createCanvas, loadImage } = require("canvas");
+const path = require("path");
 
 module.exports = {
   config: {
     name: "hug",
-    version: "1.1.0",
+    version: "1.2.1",
     author: "Rakib Adil",
     countDown: 5,
+    cost: 300,
     role: 0,
     longDescription: "{p}hug @mention someone you want to hug that person 🫂",
     category: "funny",
@@ -42,7 +44,7 @@ module.exports = {
       const canvas = createCanvas(800, 750);
       const ctx = canvas.getContext("2d");
 
-      const background = await loadImage("https://files.catbox.moe/qxovn9.jpg");
+      const background = await loadImage(path.join(__dirname, "assets", "images", "hug.jpg"));
       ctx.drawImage(background, 0, 0, canvas.width, canvas.height);
 
       const avatar1 = await loadImage(avatarURL1);
@@ -64,7 +66,7 @@ module.exports = {
       ctx.drawImage(avatar2, 145, 265, 170, 170);
       ctx.restore();
 
-      const outputPath = `${__dirname}/tmp/hug_image.png`;
+      const outputPath = path.join(__dirname, "tmp", "hug_image.png");
       const buffer = canvas.toBuffer("image/png");
       fs.writeFileSync(outputPath, buffer);
 
