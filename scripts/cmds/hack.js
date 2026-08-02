@@ -1,17 +1,15 @@
 const { loadImage, createCanvas } = require('canvas');
 const axios = require('axios');
 const fs = require('fs-extra');
-const path = require("path");
 
 module.exports = {
   config: {
     name: "hack",
-    version: "1.2.0",
+    version: "1.0.10",
     author: "Rakib Adil",
     description: "Create a fake hacked image for mentioned user or the sender user",
     guide: "use {p}hack or {p}hack @mention or reply to someone's message",
     countDown: 5,
-    cost: 250,
     role: 0,
     category: "fun",
     usePrefix: true, // you can use this cmd without prefix by setting to false.
@@ -47,30 +45,9 @@ module.exports = {
     });
   },
 
-  onStart: async ({ args, api, event, message }) => {
-    const length = Math.random() > 0.5 ? 5 : 6;
-    const randomNumber = Math.floor(Math.pow(10, length - 1) + Math.random() * 9 * Math.pow(10, length - 1));
-    const hackMsg = [
-      "scanning id...🔎",
-      "cracking password...🔐",
-      "cracking...⛓️‍💥",
-      "bypassing security system...🛡️",
-      "id hacked done, sending password..🚀"
-    ];
-   const msg = await message.reply("start hacking...⏳");
-   
-   const eAuth = "52616b6962204164696c";
-    const dAuth = Buffer.from(eAuth, "hex").toString("utf8");
-    const author = module.exports.config;
-    
-    if (author.author !== dAuth) return message.reply("Author name is changed, please rename it to default: Rakib Adil");
-    
-    for (let i = 0; i < hackMsg.length; i++) {
-      await new Promise(r => setTimeout(r, 2000));
-      await api.editMessage(hackMsg[i], msg.messageID);
-    };
-    const pathImg = path.join(__dirname, "assets","images","hack.png");
-    const pathAvt1 = path.join(__dirname, "cache","avt.png");
+  onStart: async ({ args, api, event }) => {
+    const pathImg = __dirname + "/cache/bgImg.png";
+    const pathAvt1 = __dirname + "/cache/avt.png";
 
     const mentionIds = Object.keys(event.mentions || {});
     const targetId = (event.messageReply && event.messageReply.senderID)
@@ -79,15 +56,21 @@ module.exports = {
 
     let name = "Unknown";
     try {
-      const info = (await api.getUserInfoV2(targetId));
-      if (info && info?.name) name = info?.name;
+      const info = await api.getUserInfo(targetId);
+      if (info && info[targetId] && info[targetId].name) name = info[targetId].name;
     } catch (e) {
       console.warn("getUserInfo failed:", e?.message || e);
     }
 
-    const bgImg = path.join(__dirname, " cache", "images", `hack${Date.now().toString(2,8)}.png`);
+    const bgImg = [
+      "https://i.ibb.co/zTf5GSs2/Screenshot-2025-03-03-22-28-20-197-com-facebook-lite-1.png"
+    ];
+    const rndm = bgImg[Math.floor(Math.random() * bgImg.length)];
 
     try {
+      const bgRes = await axios.get(rndm, { responseType: "arraybuffer" });
+      fs.writeFileSync(pathImg, Buffer.from(bgRes.data));
+
       const avtRes = await axios.get(
         `https://graph.facebook.com/${targetId}/picture?width=720&height=720&access_token=6628568379%7Cc1e620fa708a1d5696fb991c1bde5662`,
         { responseType: "arraybuffer" }
@@ -121,16 +104,19 @@ module.exports = {
       ctx.drawImage(baseAvt, 127, 660, 130, 140);
 
       const imageBuffer = canvas.toBuffer();
-      fs.writeFileSync(bgImg, imageBuffer);
+      fs.writeFileSync(pathImg, imageBuffer);
 
       fs.removeSync(pathAvt1);
 
-      return setTimeout(() => {
-        api.sendMessage({ 
-          body: `✅ hacked the account\nthe password is ${randomNumber}💀`,
-          attachment: fs.createReadStream(bgImg)
-        },event.threadID, () => fs.unlinkSync(bgImg),event.messageID
-        )}, 15000)
+      return api.sendMessage(
+        {
+          body: "✅ hacked done, please check your inbox for pass ⚠️",
+          attachment: fs.createReadStream(pathImg)
+        },
+        event.threadID,
+        () => fs.unlinkSync(pathImg),
+        event.messageID
+      );
     } catch (err) {
       console.error("Error in hack cmd:", err);
       try { if (fs.existsSync(pathAvt1)) fs.removeSync(pathAvt1); } catch(e){}

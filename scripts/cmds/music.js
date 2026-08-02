@@ -5,8 +5,8 @@ const path = require("path");
 
 module.exports = {
   config: {
-    name: "sing",
-    aliases: ["song"],
+    name: "music",
+    aliases: [],
     version: "2.4.78",
     author: "ST | Sheikh Tamim",
     role: 0,
@@ -16,10 +16,7 @@ module.exports = {
   ST: async function ({ message, args, event, usersData }) {
     const stapi = new global.utils.STBotApis();
 
-    if (!args[0]) {
-      return message.reply("🎵 Enter song name");
-    }
-
+    if (!args[0]) return message.reply("🎵 Enter song name");
 
     let showList = false;
 
@@ -31,7 +28,6 @@ module.exports = {
     const query = args.join(" ");
     if (!query) return message.reply("❌ Enter song name");
 
-    const userName = await usersData.getName(event.senderID);
     const processing = await message.reply(`⏳ Searching "${query}"...`);
 
     try {
@@ -41,25 +37,47 @@ module.exports = {
         return message.reply("❌ No results found");
       }
 
-
+      // ================= SINGLE AUTO DOWNLOAD =================
       if (!showList) {
         const v = search.videos[0];
 
         await message.unsend(processing.messageID);
+        const dlMsg = await message.reply(`⬇️ Processing: ${v.title}`);
 
-        const dlMsg = await message.reply(`⬇️ Downloading: ${v.title}`);
-
-        const res = await axios.post(`${stapi.baseURL}/audioytdlv1`, {
-          url: v.url,
-          format: "mp3"
+        // STEP 1: GET FORMATS
+        const step1 = await axios.post(`${stapi.baseURL}/st/ytviddl`, {
+          url: v.url
         });
 
-        if (!res.data?.downloadUrl) {
+        console.log("STEP 1:", step1.data);
+
+        const formats = step1.data?.formats || [];
+
+        // FIND MP3 OR FALLBACK AUDIO
+        let selected =
+          formats.find(f => f.ext === "MP3") ||
+          formats.find(f => f.type === "Audio");
+
+        if (!selected) {
+          await message.unsend(dlMsg.messageID);
+          return message.reply("❌ No audio format found");
+        }
+
+        // STEP 2: FINAL DOWNLOAD URL
+        const step2 = await axios.post(`${stapi.baseURL}/st/ytviddl`, {
+          url: v.url,
+          formatUrl: selected.url
+        });
+
+        console.log("STEP 2:", step2.data);
+
+        if (!step2.data?.downloadUrl) {
           await message.unsend(dlMsg.messageID);
           return message.reply("❌ Download failed");
         }
 
-        const audio = await axios.get(res.data.downloadUrl, {
+        // DOWNLOAD FILE
+        const audio = await axios.get(step2.data.downloadUrl, {
           responseType: "arraybuffer"
         });
 
@@ -81,7 +99,7 @@ module.exports = {
         return;
       }
 
-
+      // ================= SHOW LIST =================
       const top = search.videos.slice(0, 6);
 
       let msg = `🔍 Results for "${query}"\n\n`;
@@ -109,36 +127,55 @@ module.exports = {
     }
   },
 
-
+  // ================= REPLY HANDLER =================
   onReply: async function ({ message, event, Reply, usersData }) {
-    if (event.senderID !== Reply.author) {
+    if (event.senderID !== Reply.author)
       return message.reply("⚠️ Not your request");
-    }
 
     const choice = parseInt(event.body);
-    if (isNaN(choice) || choice < 1 || choice > Reply.videos.length) {
+    if (isNaN(choice) || choice < 1 || choice > Reply.videos.length)
       return message.reply("❌ Invalid choice");
-    }
 
     const stapi = new global.utils.STBotApis();
     const video = Reply.videos[choice - 1];
 
     const userName = await usersData.getName(event.senderID);
-
-    const dlMsg = await message.reply(`⬇️ Downloading: ${video.title}`);
+    const dlMsg = await message.reply(`⬇️ Processing: ${video.title}`);
 
     try {
-      const res = await axios.post(`${stapi.baseURL}/audioytdlv1`, {
-        url: video.url,
-        format: "mp3"
+      // STEP 1
+      const step1 = await axios.post(`${stapi.baseURL}/st/ytviddl`, {
+        url: video.url
       });
 
-      if (!res.data?.downloadUrl) {
+      console.log("STEP 1:", step1.data);
+
+      const formats = step1.data?.formats || [];
+
+      let selected =
+        formats.find(f => f.ext === "MP3") ||
+        formats.find(f => f.type === "Audio");
+
+      if (!selected) {
+        await message.unsend(dlMsg.messageID);
+        return message.reply("❌ No audio format found");
+      }
+
+      // STEP 2
+      const step2 = await axios.post(`${stapi.baseURL}/st/ytviddl`, {
+        url: video.url,
+        formatUrl: selected.url
+      });
+
+      console.log("STEP 2:", step2.data);
+
+      if (!step2.data?.downloadUrl) {
         await message.unsend(dlMsg.messageID);
         return message.reply("❌ Download failed");
       }
 
-      const audio = await axios.get(res.data.downloadUrl, {
+      // DOWNLOAD
+      const audio = await axios.get(step2.data.downloadUrl, {
         responseType: "arraybuffer"
       });
 
@@ -151,8 +188,7 @@ module.exports = {
       await message.reply({
         body:
           `🎶 ${video.title}\n` +
-          `👤 Requested by: ${userName}\n` +
-          `⏱ ${video.timestamp}`,
+          `👤 Requested by: ${userName}`,
         attachment: fs.createReadStream(file)
       });
 

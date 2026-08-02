@@ -1,10 +1,8 @@
 <div align="center">
 
-# 🐐 ST-BOT
-> **Author:** Sheikh Tamim  
-> **Maintainer:** Bruxa | Rakib Adil
+# 🐐 ST-BOT - By Sheikh Tamim
 
-<img src="./dashboard/images/logo.jpg" alt="ST-Bot Logo" width="200" height="200" style="border-radius: 50%;">
+<img src="./dashboard/images/st.png" alt="ST-Bot Logo" width="200" height="200" style="border-radius: 50%;">
 
 *A customized and powerful multi-purpose chatbot framework for Facebook Messenger*
 
@@ -19,15 +17,10 @@
 [![Deploy on Render](https://img.shields.io/badge/Deploy%20on-Render-46E3B7?style=for-the-badge&logo=render&logoColor=white)](https://replit.com/github/sheikhtamimlover/ST-BOT)
 [![Visitors](https://visitor-badge.laobi.icu/badge?page_id=sheikhtamimlover.ST-BOT)](https://github.com/sheikhtamimlover/ST-BOT)
 
-**Enhanced version of GoatBot V2** - Modified by **Sheikh Tamim** & maintained by **Rakib Adil**
+**Enhanced version of GoatBot V2** - Modified and maintained by **Sheikh Tamim**
 
-### Sheikh Tamim
 [![Instagram](https://img.shields.io/badge/Instagram-@sheikh.tamim__lover-E4405F?style=for-the-badge&logo=instagram&logoColor=white)](https://www.instagram.com/sheikh.tamim_lover/)
 [![GitHub](https://img.shields.io/badge/GitHub-sheikhtamimlover-181717?style=for-the-badge&logo=github&logoColor=white)](https://github.com/sheikhtamimlover)
-
-### Rakib Adil
-[![Instagram](https://img.shields.io/badge/Instagram-@rakib_x_404-833AB4?style=for-the-badge&logo=instagram&logoColor=white)](https://www.instagram.com/rakib_x_404/)
-[![GitHub](https://img.shields.io/badge/GitHub-bruxa6t9-2EA44F?style=for-the-badge&logo=github&logoColor=white)](https://github.com/bruxa6t9)
 
 ---
 
@@ -285,12 +278,12 @@ ST-BOT uses **ST-FCA** - an optimized, custom-built Facebook Chat API for better
 ### Installation
 
 ```bash
-npm install @bruxa/stfca
+npm install stfca
 ```
 
 ### GitHub Repository
 
-🔗 [https://github.com/bruxa6t9/ST-FCA.git](https://github.com/bruxa6t9/ST-FCA.git)
+🔗 [https://github.com/sheikhtamimlover/ST-FCA.git](https://github.com/sheikhtamimlover/ST-FCA.git)
 
 ### Features
 
@@ -494,24 +487,32 @@ The most advanced AI command with code generation and bug fixing capabilities!
 
 ---
 
-## 📞 Support & Contact
+## 📞 Support & Community
 
-### Maintained By
+### Need Help?
 
-**Rakib Adil** - Bruxa | @bruxa6t9
+- 📱 **Messenger Group**: [Join Support Group](https://m.me/j/AbYvFRTzENblDU94/)
+- 📸 **Instagram**: [@sheikh.tamim_lover](https://www.instagram.com/sheikh.tamim_lover/)
+- 💬 **Facebook**: [m.me/tormairedusi](https://m.me/tormairedusi)
+- 🐛 **Report Issues**: Use `!streport <your issue>` command
 
-- 🔗 **Facebook:** [facebook.com/RAKIB.404X](https://facebook.com/RAKIB.404X)
-- 💬 **Telegram:** [@RAKIBX](https://t.me/RAKIBX)
-- 🐙 **GitHub:** [@bruxa6t9](https://github.com/bruxa6t9)
+### Regular Updates
 
-### Original Creator
+- ✅ Active development and maintenance
+- ✅ Regular feature additions
+- ✅ Bug fixes and improvements
+- ✅ Community-driven enhancements
 
-**Sheikh Tamim** - ST
+### Report Issues
 
-- 📱 **Instagram:** [@sheikh.tamim_lover](https://www.instagram.com/sheikh.tamim_lover/)
-- 🔗 **Facebook:** [facebook.com/hamza.chudena](https://www.facebook.com/hamza.chudena)
-- 🐙 **GitHub:** [@sheikhtamimlover](https://github.com/sheikhtamimlover)
+Use the built-in report command:
+```bash
+!streport <describe your issue or feature request>
+```
 
+Your report will be sent directly to the developer!
+
+---
 
 ## 📋 Essential Commands
 
@@ -552,8 +553,7 @@ This project receives regular updates with:
 This project is licensed under the MIT License. You are free to use, modify, and distribute this software, but please maintain the original credits.
 
 **Original GoatBot V2** by NTKhang  
-**Enhanced** by Sheikh Tamim
-**Maintained** by Rakib Adil
+**Enhanced & Maintained** by Sheikh Tamim
 
 ---
 
@@ -564,6 +564,7 @@ If you find this project helpful:
 - 🍴 Fork and contribute
 - 📢 Share with others
 - 💬 Join our community
+- 🔗 Follow on Instagram: [@sheikh.tamim_lover](https://www.instagram.com/sheikhtamimlover/)
 
 ---
 

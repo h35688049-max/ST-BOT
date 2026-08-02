@@ -75,6 +75,16 @@ module.exports = (api, threadModel, userModel, dashBoardModel, globalModel, user
 
         const botID = api.getCurrentUserID();
 
+        // For E2EE threads, skip getMessage (not supported) and attempt unsend directly
+        if (event.isE2EE) {
+          const e2eeJid = global._e2eeMessageMap && global._e2eeMessageMap.get(String(reactMessageID));
+          if (e2eeJid) {
+            await api.unsendMessage(reactMessageID).catch(() => {});
+            global.utils.log.info("ANTI REACT", `Admin ${userID} unsent E2EE bot message ${reactMessageID}`);
+          }
+          return;
+        }
+
         // Check if the message was sent by the bot (non-E2EE)
         const messageInfo = await api.getMessage(threadID, reactMessageID);
 
@@ -127,6 +137,20 @@ module.exports = (api, threadModel, userModel, dashBoardModel, globalModel, user
         onStart();
         onReply();
         break;
+      // ── E2EE message types ────────────────────────────────────────────────
+      case "e2ee_message":
+      case "e2ee_message_edit":
+        // onFirstChat/onChat are skipped for E2EE: those hooks run DB queries
+        // expecting numeric threadIDs; E2EE JIDs (e.g. "123@msgr") would cause
+        // INVALID_THREAD_ID errors in commands like count/rankup/shortcut/etc.
+        onStart();
+        onReply();
+        break;
+      case "e2ee_message_reaction":
+        onReaction();
+        await handleAntiReact(event, api, message);
+        break;
+      // ─────────────────────────────────────────────────────────────────────
       case "event":
         handlerEvent();
         onEvent();

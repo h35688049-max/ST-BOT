@@ -27,8 +27,6 @@
     "notes": "Bio update system. When enabled, bot will update user bio on startup. If updateOnce is true, bio will only be updated once and not on every restart. Leave bioText empty to disable."
   },
   "antiInbox": true,
-  "bruxaApiKey": "bruxa-76acde6852d69cf0-2fbba28d5ea6f4a6",
-  "notes": "this bruxa apikey has only 1000 credit, go and get your apikey from bruxa-apis",
   "nickNameBot": "ST | BOT",
   "prefix": "!",
   "usePrefix": {
@@ -220,6 +218,13 @@
   },
   "enableTypingIndicator": true,
   "typingDuration": 1000,
+  "e2eeTypingDuration": 3000,
+  "e2ee": {
+    "enable": true,
+    "saveType": "memory",
+    "devicePath": "database/e2ee-device.json",
+    "notes": "End-to-end encryption (E2EE / Labyrinth) for Messenger. Set enable to true to activate. saveType: 'memory' (device keys lost on restart — fast, no files), 'path' (persist device identity keys to devicePath — survives restarts, recommended for production). devicePath is only used when saveType is 'path'. Modeled after the database block."
+  },
   "stai": {
     "enable": true,
     "provider": "openrouter",

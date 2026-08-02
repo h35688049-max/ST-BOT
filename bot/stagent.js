@@ -846,6 +846,7 @@ class STAgent {
       "Goat.js",
       "fca/index.js",
       "fca/utils.js",
+      "fca/e2ee.js",
       "fca/src/listenMqtt.js",
       "fca/src/sendMessage.js",
       ...extraFiles
@@ -907,6 +908,7 @@ class STAgent {
       fcaCore: [
         "fca/index.js",
         "fca/utils.js",
+        "fca/e2ee.js",
         "fca/lib/index.mjs",
         "fca/src/listenMqtt.js",
         "fca/src/sendMessage.js",
